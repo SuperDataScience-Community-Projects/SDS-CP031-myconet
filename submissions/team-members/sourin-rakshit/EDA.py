@@ -33,4 +33,25 @@ df = pd.DataFrame.from_records(records)
 print(f"Total images: {len(df)}")
 df.head()
 
+# Block 3: Class Distribution & Imbalance Check
+class_counts = df["class"].value_counts().sort_index()
+print(class_counts)
 
+plt.figure(figsize=(8,5))
+sns.barplot(x=class_counts.index, y=class_counts.values, palette="viridis")
+plt.title("Class Distribution (H1–H6)")
+plt.xlabel("Class")
+plt.ylabel("Number of images")
+plt.show()
+
+# Block 4: Missing / Broken Files Check
+broken = []
+for idx, row in df.iterrows():
+    try:
+        Image.open(row["filepath"]).verify()
+    except Exception:
+        broken.append(row["filepath"])
+
+print(f"Broken or unreadable images: {len(broken)}")
+if broken:
+    print(broken[:10])
