@@ -18,3 +18,19 @@ DATA_DIR = Path("/kaggle/input/defungi")      # or "/kaggle/input/joebeachcapita
 assert DATA_DIR.exists(), f"{DATA_DIR} not found!"
 CLASS_DIRS = sorted([d for d in DATA_DIR.iterdir() if d.is_dir()])
 print("Found classes:", [d.name for d in CLASS_DIRS])
+
+# Block 2: Build DataFrame of file paths & labels
+records = []
+for cls_dir in CLASS_DIRS:
+    cls_name = cls_dir.name
+    for img_path in cls_dir.glob("*"):
+        records.append({
+            "filepath": str(img_path),
+            "class": cls_name
+        })
+
+df = pd.DataFrame.from_records(records)
+print(f"Total images: {len(df)}")
+df.head()
+
+
