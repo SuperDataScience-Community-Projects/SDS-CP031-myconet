@@ -55,3 +55,37 @@ for idx, row in df.iterrows():
 print(f"Broken or unreadable images: {len(broken)}")
 if broken:
     print(broken[:10])
+
+# Block 5: Visualize Sample Images per Class
+def plot_samples(df, cls, n=6):
+    imgs = df[df["class"]==cls]["filepath"].sample(n, random_state=42).tolist()
+    fig, axes = plt.subplots(1, n, figsize=(n*2,2))
+    for ax, img_p in zip(axes, imgs):
+        ax.imshow(Image.open(img_p))
+        ax.axis("off")
+    fig.suptitle(f"Samples from class {cls}", y=1.1)
+    plt.tight_layout()
+    plt.show()
+
+for cls in sorted(df["class"].unique()):
+    plot_samples(df, cls, n=5)
+
+
+# Block 6:Proportion by Class 
+# Assuming `class_counts` from before
+total = class_counts.sum()
+imbalance = (class_counts / total).sort_index()
+print(imbalance)
+
+plt.figure(figsize=(6,4))
+sns.barplot(x=imbalance.index, y=imbalance.values)
+plt.title("Class Proportions (Imbalance)")
+plt.ylabel("Proportion of dataset")
+plt.show()
+
+from sklearn.utils.class_weight import compute_class_weight
+classes = sorted(df["class"].unique())
+y = df["class"].values
+cw = compute_class_weight("balanced", classes=classes, y=y)
+class_weights = dict(zip(classes, cw))
+print(class_weights)
