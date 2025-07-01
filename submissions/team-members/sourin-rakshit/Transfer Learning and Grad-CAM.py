@@ -106,3 +106,30 @@ else:
     print("Saved splits cache.")
 
 num_classes = train_df["label"].nunique()
+
+
+# ───────────────────────────────────────────────────────────────
+# 3. CLASS WEIGHTS
+# ───────────────────────────────────────────────────────────────
+cw = compute_class_weight(
+    "balanced", classes=np.arange(num_classes),
+    y=train_df["label"]
+)
+weight_tensor = torch.tensor(cw, dtype=torch.float32, device=DEVICE)
+
+# ───────────────────────────────────────────────────────────────
+# 4. DATASET
+# ───────────────────────────────────────────────────────────────
+class FungiDS(Dataset):
+    def __init__(self, df: pd.DataFrame, tf):
+        self.df = df
+        self.tf = tf
+    def __len__(self):
+        return len(self.df)
+    def __getitem__(self, idx: int):
+        row = self.df.iloc[idx]
+        img = Image.open(row["path"]).convert("RGB")
+        return self.tf(img), int(row["label"])
+
+
+
